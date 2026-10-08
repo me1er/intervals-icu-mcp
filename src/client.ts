@@ -47,17 +47,30 @@ export async function postFile<T>(path: string, filePath: string, fields?: Recor
   return data;
 }
 
+// intervals.icu returns error details as { error } or { message }, sometimes as plain text
+function apiErrorDetail(data: unknown): string | undefined {
+  if (typeof data === "string") return data.trim() || undefined;
+  if (data && typeof data === "object") {
+    const { error, message } = data as { error?: unknown; message?: unknown };
+    if (typeof error === "string" && error) return error;
+    if (typeof message === "string" && message) return message;
+  }
+  return undefined;
+}
+
 function formatApiError(err: unknown): string {
   if (err instanceof AxiosError) {
     if (!err.response) {
       return "Network error: could not reach intervals.icu — check your internet connection";
     }
     const { status } = err.response;
-    if (status === 401 || status === 403) return "401/403: Invalid API key or access denied — check INTERVALS_API_KEY in your config";
-    if (status === 404) return "404: Resource not found — check the ID you provided";
-    if (status === 429) return "429: Rate limited — wait a moment and try again";
-    if (status >= 500) return `${status}: Intervals.icu server error — try again later`;
-    return `${status}: Unexpected API error`;
+    const detail = apiErrorDetail(err.response.data);
+    const withDetail = (text: string) => (detail ? `${text} (intervals.icu: ${detail})` : text);
+    if (status === 401 || status === 403) return withDetail("401/403: Invalid API key or access denied — check INTERVALS_API_KEY in your config");
+    if (status === 404) return withDetail("404: Resource not found — check the ID you provided");
+    if (status === 429) return withDetail("429: Rate limited — wait a moment and try again");
+    if (status >= 500) return withDetail(`${status}: Intervals.icu server error — try again later`);
+    return detail ? `${status}: ${detail}` : `${status}: Unexpected API error`;
   }
   if (err instanceof Error) return `Unexpected error: ${err.message}`;
   return "Unexpected error";

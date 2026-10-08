@@ -11,11 +11,11 @@ vi.mock("../client.js", async (importOriginal) => {
   return { ...actual, get: vi.fn(), post: vi.fn(), put: vi.fn(), postFile: vi.fn() };
 });
 
-function makeAxiosError(status: number | null): AxiosError {
+function makeAxiosError(status: number | null, data: unknown = null): AxiosError {
   const err = new AxiosError("test error");
   if (status !== null) {
     // @ts-expect-error — minimal AxiosResponse mock
-    err.response = { status, data: null, headers: {}, config: {}, statusText: String(status) };
+    err.response = { status, data, headers: {}, config: {}, statusText: String(status) };
   }
   return err;
 }
@@ -62,6 +62,32 @@ describe("withErrorHandling", () => {
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain("500");
     expect(result.content[0].text).toContain("server error");
+  });
+
+  it("passes through the API error detail for other 4xx errors", async () => {
+    const err = makeAxiosError(422, { status: 422, error: "Athlete has no kj0 defined" });
+    const result = await withErrorHandling(vi.fn().mockRejectedValue(err))({});
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toBe("422: Athlete has no kj0 defined");
+  });
+
+  it("reads the detail from a message field or a plain-text body", async () => {
+    const fromMessage = await withErrorHandling(vi.fn().mockRejectedValue(makeAxiosError(400, { message: "Invalid date" })))({});
+    expect(fromMessage.content[0].text).toBe("400: Invalid date");
+    const fromText = await withErrorHandling(vi.fn().mockRejectedValue(makeAxiosError(400, "Bad request body")))({});
+    expect(fromText.content[0].text).toBe("400: Bad request body");
+  });
+
+  it("falls back to a generic message for 4xx errors without detail", async () => {
+    const result = await withErrorHandling(vi.fn().mockRejectedValue(makeAxiosError(422)))({});
+    expect(result.content[0].text).toBe("422: Unexpected API error");
+  });
+
+  it("appends the API error detail to known status messages", async () => {
+    const err = makeAxiosError(404, { error: "Activity not found" });
+    const result = await withErrorHandling(vi.fn().mockRejectedValue(err))({});
+    expect(result.content[0].text).toContain("check the ID you provided");
+    expect(result.content[0].text).toContain("(intervals.icu: Activity not found)");
   });
 
   it("returns isError:true with a network message when there is no response", async () => {

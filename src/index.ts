@@ -7,6 +7,7 @@ import { registerCalendarTools } from "./tools/calendar.js";
 import { registerWorkoutTools } from "./tools/workouts.js";
 import { registerFitnessTools } from "./tools/fitness.js";
 import { registerCurveTools } from "./tools/curves.js";
+import { registerStreamTools } from "./tools/streams.js";
 import { validateEnv, athleteIdMismatchCheck } from "./startup.js";
 
 validateEnv();
@@ -23,6 +24,7 @@ registerCalendarTools(server);
 registerWorkoutTools(server);
 registerFitnessTools(server);
 registerCurveTools(server);
+registerStreamTools(server);
 
 const transport = new StdioServerTransport();
 await server.connect(transport);

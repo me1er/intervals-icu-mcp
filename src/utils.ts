@@ -10,3 +10,8 @@ export function isoDate(d: Date): string {
 export function jsonResult(data: unknown): ToolResult {
   return { content: [{ type: "text" as const, text: JSON.stringify(data, null, 2) }] };
 }
+
+// No indentation — for large payloads like activity streams, where pretty-printing triples the size
+export function compactJsonResult(data: unknown): ToolResult {
+  return { content: [{ type: "text" as const, text: JSON.stringify(data) }] };
+}

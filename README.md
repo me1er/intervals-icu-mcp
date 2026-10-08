@@ -129,6 +129,19 @@ If Claude responds with your training data, setup is complete.
 | `create_activity` | Upload a `.fit`, `.tcx`, or `.gpx` file |
 | `update_activity` | Update name, description, sport type, or start time |
 
+### Activity Streams
+
+| Tool | Description |
+|---|---|
+| `get_activity_streams` | All complete time-series streams of an activity, optionally filtered by type |
+| `get_activity_time_stream` | Elapsed time per sample (to align single streams) |
+| `get_activity_power_stream` | Power stream (watts) only |
+| `get_activity_heartrate_stream` | Heart rate stream only |
+| `get_activity_cadence_stream` | Cadence stream only |
+| `get_activity_speed_stream` | Smoothed speed stream (m/s) only |
+| `get_activity_altitude_stream` | Altitude stream only |
+| `get_activity_gps_stream` | GPS track as `[lat, lng]` pairs only |
+
 ### Calendar
 
 | Tool | Description |
@@ -151,6 +164,11 @@ If Claude responds with your training data, setup is complete.
 | `get_power_curves` | Power-duration curve (MMP) for a date range and sport type |
 | `get_hr_curves` | HR-duration curve for a date range and sport type |
 | `get_pace_curves` | Pace-duration curve for a date range and sport type |
+| `get_activity_power_curve` | Power-duration curve of a single activity, optionally for a fatigue level (`kj0`/`kj1`) |
+| `get_activity_power_curves` | Power curves of a single activity for several power streams and/or fatigue levels |
+| `get_activity_hr_curve` | HR-duration curve of a single activity |
+| `get_activity_pace_curve` | Pace-distance curve of a single activity, optionally grade adjusted (GAP) |
+| `get_activity_power_vs_hr_curve` | Power vs HR of a single activity: power/HR ratio, aerobic decoupling, per-minute buckets |
 
 ### Fitness & Wellness
 
