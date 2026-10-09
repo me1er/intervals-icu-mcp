@@ -33,6 +33,11 @@ export async function put<T>(path: string, body: unknown): Promise<T> {
   return data;
 }
 
+export async function del<T>(path: string, params?: Record<string, unknown>): Promise<T> {
+  const { data } = await client.delete<T>(path, { params });
+  return data;
+}
+
 export async function postFile<T>(path: string, filePath: string, fields?: Record<string, string>): Promise<T> {
   const form = new FormData();
   form.append("file", fs.createReadStream(filePath));

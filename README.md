@@ -149,6 +149,9 @@ If Claude responds with your training data, setup is complete.
 | `list_events` | Planned workouts and events in a date range |
 | `create_event` | Add a planned workout or event to the calendar |
 | `update_event` | Edit an existing calendar event |
+| `create_planned_workout` | Schedule a workout on an athlete's calendar (optional `athleteId` for coaches) |
+| `update_planned_workout` | Edit a planned workout by event ID |
+| `delete_planned_workout` | Remove a planned workout from the calendar by event ID |
 
 ### Workout Library
 
